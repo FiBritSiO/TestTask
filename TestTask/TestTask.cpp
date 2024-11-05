@@ -11,8 +11,8 @@ struct knurbs
     int     kctp;       /* Число контрольных точек, д.б. >2              */
     double* knot;       /* Массив кнот. Количество=kctp+deg-1. М.б.=NULL */
     double* wgt;        /* Массив весов контрольных точек.               */
-    /* Количество = числу опорных точек.             */
-    /* Если = NULL, то сплайн не рациональный        */
+                        /* Количество = числу опорных точек.             */
+                        /* Если = NULL, то сплайн не рациональный        */
     int    deg;         /* Степень кривой                                */
 };
 
@@ -231,17 +231,26 @@ double findMinDistanceFromPoint(knurbs* kr, double* tz, double* tkr = NULL)
 {
 
     Point3D _tz = { tz[0] , tz[1], tz[2] };
-    double a = kr->knot[0];
     int knot_size = kr->deg + kr->kctp + 1;
-    double b = kr->knot[knot_size - 1];
+    double a, b;
+    if (kr->knot == NULL)
+    {
+        a = 0;
+        b = 1;
+    }
+    else
+    {
+         a = kr->knot[0];
+         b = kr->knot[knot_size - 1];
 
+    }
     double x1 = a + (3 - sqrt(5)) / 2 * (b - a);
     double x2 = a + (sqrt(5) - 1) / 2 * (b - a);
     double f1 = distancePoint(kr, _tz, x1);
     double f2 = distancePoint(kr, _tz, x2);
     double tau = (sqrt(5) - 1) / 2;
     double eps_n = (b - a) / 2;
-    while (eps_n > Precsn)
+    while (eps_n > Precsn/10)
     {
 
         if (f1 <= f2)
@@ -466,8 +475,8 @@ void task2_test()
 
 int main()
 {
-    task1_test();
-    task2_test();
+   task1_test();
+   task2_test();
 
 
 
